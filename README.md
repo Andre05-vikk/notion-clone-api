@@ -9,7 +9,23 @@ A RESTful API for managing tasks and users, built with Node.js and Express.
 npm install
 ```
 
-2. Start the server:
+2. Set up the database:
+- Install MariaDB if you haven't already
+- Create a new MariaDB database named 'notion_clone'
+- Copy `.env.example` to `.env` and update the database connection settings:
+```env
+DB_HOST=localhost
+DB_USER=your_database_user
+DB_PASSWORD=your_database_password
+DB_DATABASE=notion_clone
+```
+
+3. Run database migrations:
+```bash
+npm run migrate
+```
+
+4. Start the server:
 ```bash
 npm start
 ```
