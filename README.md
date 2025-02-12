@@ -8,9 +8,13 @@ A minimalistic wiki and notes application for organizing content, built with Nod
 - JWT-based authentication for secure API access
 - Session management with MariaDB store
 - MariaDB database for persistent data storage
-- OpenAPI/Swagger documentation
+- OpenAPI/Swagger documentation (available at `/docs`)
 - Modern and clean API design
 - CORS enabled for cross-origin requests
+
+## API Documentation
+
+The API documentation is available through SwaggerUI at the `/docs` endpoint. Visit http://localhost:3000/docs after starting the server to view the interactive API documentation.
 
 ## Prerequisites
 
@@ -53,10 +57,6 @@ npm start
 
 ## API Documentation
 
-After starting the server, you can access the API documentation at:
-```
-http://localhost:3000/api-docs
-```
 
 The API documentation is generated using OpenAPI/Swagger and provides:
 - Detailed endpoint descriptions
@@ -73,9 +73,6 @@ The API documentation is generated using OpenAPI/Swagger and provides:
 └── README.md          # Project documentation
 ```
 
-## License
-
-ISC License
 
 
 ## API Documentation
@@ -83,11 +80,47 @@ ISC License
 ### Authentication
 The API uses JWT (JSON Web Token) for authentication. To access protected endpoints:
 
-1. First, obtain a JWT token by making a POST request to `/login` with your credentials
+1. First, obtain a JWT token by making a POST request to `/sessions` with your credentials
 2. Include the token in the Authorization header of subsequent requests:
 ```
 Authorization: Bearer your-jwt-token
 ```
+
+### Task Management
+
+#### Delete a Task
+Delete a specific task by its ID:
+```http
+DELETE /tasks/{taskId}
+Authorization: Bearer your-jwt-token
+```
+
+Responses:
+- `200`: Task successfully deleted
+- `404`: Task not found or unauthorized
+- `401`: Authentication required
+- `403`: Invalid token
+
+#### Update a Task (Partial)
+Update specific fields of a task:
+```http
+PATCH /tasks/{taskId}
+Authorization: Bearer your-jwt-token
+
+{
+    "title": "Updated task title",      // optional
+    "description": "New description", // optional
+    "status": "in_progress",         // optional: todo, in_progress, done
+    "due_date": "2024-12-31T23:59:59Z" // optional
+}
+```
+
+Responses:
+- `200`: Task successfully updated (returns updated task)
+- `400`: No fields to update provided
+- `404`: Task not found or unauthorized
+- `401`: Authentication required
+- `403`: Invalid token
 
 
 The API documentation is available through Swagger UI at:
@@ -123,15 +156,3 @@ Authorization: Bearer <your-token>
 - `server.js` - Main application entry point
 - `openapi.yaml` - API specification and documentation
 - `package.json` - Project dependencies and scripts
-
-## Dependencies
-
-All required dependencies are listed in `requirements.txt` with their specific versions:
-
-- express@4.18.2 - Web framework
-- cors@2.8.5 - Cross-origin resource sharing
-- swagger-jsdoc@6.2.8 - API documentation generator
-- swagger-ui-express@5.0.0 - API documentation UI
-- yamljs@0.3.0 - YAML parser and encoder
-- nodemon@3.0.2 - Development server with auto-reload
-
