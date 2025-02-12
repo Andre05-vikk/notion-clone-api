@@ -13,8 +13,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 // Database configuration
 const dbConfig = {
     host: 'localhost',
-    user: 'root',
-    password: 'root',
+    user: '',
+    password: '',
     database: 'notion_clone'
 };
 
