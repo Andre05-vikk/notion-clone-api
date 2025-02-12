@@ -1,5 +1,0 @@
-extends: spectral:oas
-rules:
-  operation-success-response: true
-  operation-description: true
-  operation-tags: true
