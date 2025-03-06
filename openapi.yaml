@@ -526,7 +526,7 @@ paths:
 security:
 - bearerAuth: []
 servers:
-- description: Local development server
+- description: Development server
   url: /
 x-tagGroups:
 - name: API Documentation

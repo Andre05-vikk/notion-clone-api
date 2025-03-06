@@ -8,14 +8,17 @@ const session = require('express-session');
 const mariadb = require('mariadb');
 const bcrypt = require('bcrypt');
 
+// Load environment variables if .env file exists
+require('dotenv').config();
+
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
-// Database configuration
+// Database configuration from environment variables
 const dbConfig = {
-    host: 'localhost',
-    user: '',
-    password: '',
-    database: 'notion_clone'
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || '',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_DATABASE || 'notion_clone'
 };
 
 const app = express();
