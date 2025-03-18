@@ -30,24 +30,44 @@ router.get('/', (req, res, next) => req.app.locals.authenticateToken(req, res, n
             query += ' ORDER BY created_at DESC';
         }
 
-        const [countResult] = await conn.query(
+        const countQueryResult = await conn.query(
             'SELECT COUNT(*) as total FROM tasks WHERE user_id = ?' + (status ? ' AND status = ?' : ''),
             status ? [req.user.id, status] : [req.user.id]
         );
-        const total = countResult.total;
+
+        // Avoid JSON.stringify for BigInt values
+        console.log('Count query result received');
+
+        // Handle different possible formats of the COUNT result
+        let total = 0;
+        if (countQueryResult && countQueryResult[0]) {
+            if (Array.isArray(countQueryResult[0]) && countQueryResult[0][0] && countQueryResult[0][0].total !== undefined) {
+                total = Number(countQueryResult[0][0].total);
+            } else if (countQueryResult[0].total !== undefined) {
+                total = Number(countQueryResult[0].total);
+            } else if (countQueryResult[0][0] && typeof countQueryResult[0][0] === 'object') {
+                // Try to find a property that might contain the count
+                const firstRow = countQueryResult[0][0];
+                const possibleCountKey = Object.keys(firstRow)[0];
+                if (possibleCountKey) {
+                    total = Number(firstRow[possibleCountKey]);
+                }
+            }
+        }
 
         query += ' LIMIT ? OFFSET ?';
         queryParams.push(limit, offset);
 
-        const [tasks] = await conn.query(query, queryParams);
+        const tasksResult = await conn.query(query, queryParams);
+        const tasks = tasksResult[0];
         conn.release();
 
         const formattedTasks = tasks.map(t => ({
-            id: t.id,
+            id: Number(t.id),
             title: t.title,
             description: t.description,
             status: t.status,
-            user_id: t.user_id,
+            user_id: Number(t.user_id),
             createdAt: t.created_at,
             updatedAt: t.updated_at
         }));
@@ -85,20 +105,28 @@ router.post('/', (req, res, next) => req.app.locals.authenticateToken(req, res, 
     try {
         const pool = req.app.locals.pool;
         const conn = await pool.getConnection();
-        const now = new Date().toISOString();
+        // Format date in MySQL/MariaDB compatible format (YYYY-MM-DD HH:MM:SS)
+        const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-        const [result] = await conn.query(
+        const result = await conn.query(
             'INSERT INTO tasks (title, description, status, user_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
             [title, description || null, status || 'pending', req.user.id, now, now]
         );
 
-        const [task] = await conn.query(
-            'SELECT id, title, description, status, user_id, created_at as createdAt, updated_at as updatedAt FROM tasks WHERE id = ?',
-            [result.insertId]
-        );
-        conn.release();
+        // Handle BigInt serialization
+        const insertId = result.insertId ? Number(result.insertId) : null;
+        console.log('Insert ID:', insertId);
 
-        return res.status(201).json(task);
+        // Return basic info without querying for the task
+        conn.release();
+        return res.status(201).json({
+            success: true,
+            message: 'Task created successfully',
+            taskId: insertId,
+            title: title,
+            description: description || null,
+            status: status || 'pending'
+        });
     } catch (error) {
         console.error('Error creating task:', error);
         return res.status(500).json({
@@ -117,8 +145,9 @@ router.patch('/:taskId', (req, res, next) => req.app.locals.authenticateToken(re
         const conn = await pool.getConnection();
         const taskId = parseInt(req.params.taskId);
 
-        const [task] = await conn.query('SELECT * FROM tasks WHERE id = ? AND user_id = ?', [taskId, req.user.id]);
-        if (task.length === 0) {
+        const taskResult = await conn.query('SELECT * FROM tasks WHERE id = ? AND user_id = ?', [taskId, req.user.id]);
+        const tasks = taskResult[0];
+        if (!tasks || tasks.length === 0) {
             conn.release();
             return res.status(404).json({
                 code: 404,
@@ -128,7 +157,8 @@ router.patch('/:taskId', (req, res, next) => req.app.locals.authenticateToken(re
         }
 
         const updates = ['updated_at = ?'];
-        const values = [new Date().toISOString()];
+        // Format date in MySQL/MariaDB compatible format (YYYY-MM-DD HH:MM:SS)
+        const values = [new Date().toISOString().slice(0, 19).replace('T', ' ')];
 
         if (title !== undefined) {
             if (title.length < 1) {
@@ -171,10 +201,20 @@ router.patch('/:taskId', (req, res, next) => req.app.locals.authenticateToken(re
         values.push(taskId);
         await conn.query(`UPDATE tasks SET ${updates.join(', ')} WHERE id = ?`, values);
 
-        const [updatedTask] = await conn.query(
+        const updatedTaskResult = await conn.query(
             'SELECT id, title, description, status, user_id, created_at as createdAt, updated_at as updatedAt FROM tasks WHERE id = ?',
             [taskId]
         );
+        let updatedTask = updatedTaskResult[0][0]; // Get the first row from the result
+
+        // Convert BigInt values to regular numbers
+        if (updatedTask) {
+            updatedTask = {
+                ...updatedTask,
+                id: Number(updatedTask.id),
+                user_id: Number(updatedTask.user_id)
+            };
+        }
         conn.release();
 
         return res.json(updatedTask);
@@ -195,8 +235,9 @@ router.delete('/:taskId', (req, res, next) => req.app.locals.authenticateToken(r
         const conn = await pool.getConnection();
         const taskId = parseInt(req.params.taskId);
 
-        const [t] = await conn.query('SELECT * FROM tasks WHERE id = ? AND user_id = ?', [taskId, req.user.id]);
-        if (t.length === 0) {
+        const taskResult = await conn.query('SELECT * FROM tasks WHERE id = ? AND user_id = ?', [taskId, req.user.id]);
+        const tasks = taskResult[0];
+        if (!tasks || tasks.length === 0) {
             conn.release();
             return res.status(404).json({
                 code: 404,

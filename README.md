@@ -1,6 +1,18 @@
 # Notion Clone API
 
-A RESTful API for managing tasks and users, built with Node.js and Express.
+A RESTful API for managing tasks and users, built with Node.js, Express, and MariaDB.
+
+## Features
+
+- User authentication with JWT
+- Task management (create, read, update, delete)
+- Pagination, sorting, and filtering for tasks
+- Swagger UI for API documentation and testing
+
+## Prerequisites
+
+- Node.js (v14 or higher)
+- MariaDB (v10 or higher)
 
 ## Installation
 
@@ -10,29 +22,39 @@ A RESTful API for managing tasks and users, built with Node.js and Express.
 npm install
 ```
 
-1. Set up the database:
-   - Install MariaDB if you haven't already
-   - Copy `.env.example` to `.env` and update the database connection settings
-
-## Database Setup
-
-1. Create the database and tables using the SQL script:
+1. Set up the environment variables:
 
 ```bash
-mysql -u root -p < database.sql
+# Create a .env file with your database connection details
+npm run create-env
 ```
 
-1. Fill in the **`.env`** file with your database connection details:
+Or manually create a `.env` file with the following content:
 
 ```bash
 DB_HOST=localhost
 DB_USER=root
-DB_PASSWORD=your_db_password
+DB_PASSWORD=root
 DB_DATABASE=notion_clone
-JWT_SECRET=your_jwt_secret
+JWT_SECRET=your-secret-key
 ```
 
-1. Start the server:
+1. Set up the database:
+
+```bash
+# Create the database and tables
+mysql -u root -p < database.sql
+```
+
+## Running the Application
+
+### Development Mode
+
+```bash
+npm run dev
+```
+
+### Production Mode
 
 ```bash
 npm start
@@ -45,3 +67,16 @@ The server will run on port 5001 by default. You can change this by setting the 
 The API documentation is available at the root URL when the server is running:
 
 - API Documentation: <http://localhost:5001/>
+
+You can use the Swagger UI to test all endpoints directly from your browser.
+
+## Error Handling
+
+The API uses standard HTTP status codes and provides detailed error messages in the response body.
+
+## Database Structure
+
+The application uses two main tables:
+
+- `users`: Stores user information
+- `tasks`: Stores task information with a foreign key to the users table

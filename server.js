@@ -32,6 +32,14 @@ app.locals.JWT_SECRET = JWT_SECRET;
 (async () => {
     let conn;
     try {
+        console.log('Attempting to connect to database with config:', {
+            host: dbConfig.host,
+            user: dbConfig.user,
+            database: dbConfig.database,
+            // Not logging password for security reasons
+            hasPassword: dbConfig.password !== ''
+        });
+        
         conn = await pool.getConnection();
         console.log('Database connection established successfully');
 
@@ -41,10 +49,16 @@ app.locals.JWT_SECRET = JWT_SECRET;
             await conn.query('SELECT 1 FROM tasks LIMIT 1');
             console.log('Database tables verified');
         } catch (tableError) {
-            console.error('Database tables not found. Please run database.sql:', tableError.message);
+            console.error('Database tables not found. Please run database.sql:', tableError);
         }
     } catch (err) {
         console.error('Database connection failed:', err);
+        console.error('Error details:', {
+            code: err.code,
+            errno: err.errno,
+            sqlState: err.sqlState,
+            sqlMessage: err.sqlMessage
+        });
     } finally {
         if (conn) conn.release();
     }
