@@ -5,10 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js",
-    "lint": "eslint .",
-    "test": "jest",
-    "clean": "rm -rf node_modules/"
+    "dev": "nodemon server.js"
   },
   "private": true,
   "keywords": [
@@ -17,7 +14,7 @@
     "notes",
     "api"
   ],
-  "author": "",
+  "author": "Notion Clone Team",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",

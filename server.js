@@ -92,7 +92,7 @@ app.use('/tasks', require('./routes/tasks'));
 app.use('/', require('./routes/auth'));
 
 // Global error handler
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
     console.error('Unhandled error:', err);
     
     // Determine if we have a specific status code from the error
@@ -110,7 +110,10 @@ app.use((err, req, res, next) => {
 
 // Start server
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`API documentation at http://localhost:${PORT}`);
 });
+
+// Export for testing
+module.exports = {app, server};
