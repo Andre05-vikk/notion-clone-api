@@ -108,12 +108,12 @@ app.use('/', require('./routes/auth'));
 // Global error handler
 app.use((err, req, res) => {
     console.error('Unhandled error:', err);
-    
+
     // Determine if we have a specific status code from the error
     const statusCode = err.statusCode || 500;
     const errorType = statusCode === 500 ? 'Internal Server Error' : err.type || 'Error';
     const errorMessage = err.message || 'An unexpected error occurred';
-    
+
     res.status(statusCode).json({
         code: statusCode,
         error: errorType,
@@ -130,4 +130,4 @@ const server = app.listen(PORT, () => {
 });
 
 // Export for testing
-module.exports = {app, server};
+module.exports = { app, server };
