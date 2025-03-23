@@ -59,8 +59,17 @@ router.get('/', (req, res, next) => req.app.locals.authenticateToken(req, res, n
         queryParams.push(limit, offset);
 
         const tasksResult = await conn.query(query, queryParams);
-        const tasks = tasksResult[0];
         conn.release();
+
+        // Handle different possible formats of the query result
+        let tasks = [];
+        if (tasksResult && Array.isArray(tasksResult)) {
+            if (tasksResult[0] && Array.isArray(tasksResult[0])) {
+                tasks = tasksResult[0];
+            } else {
+                tasks = tasksResult;
+            }
+        }
 
         const formattedTasks = tasks.map(t => ({
             id: Number(t.id),

@@ -39,7 +39,7 @@ app.locals.JWT_SECRET = JWT_SECRET;
             // Not logging password for security reasons
             hasPassword: dbConfig.password !== ''
         });
-        
+
         conn = await pool.getConnection();
         console.log('Database connection established successfully');
 
@@ -68,10 +68,45 @@ app.locals.JWT_SECRET = JWT_SECRET;
 app.use(cors());
 app.use(express.json());
 
-// Load OpenAPI
+// Load OpenAPI English version
 const swaggerDocument = YAML.load(path.join(__dirname, 'openapi.yaml'));
-app.use('/', swaggerUi.serve);
-app.get('/', swaggerUi.setup(swaggerDocument));
+
+// Load OpenAPI Estonian version
+const swaggerDocumentEt = YAML.load(path.join(__dirname, 'openapi.et.yaml'));
+
+// Configure Swagger UI options
+const swaggerUiOptions = {
+    explorer: true,
+    customSiteTitle: "API Documentation",
+    swaggerOptions: {
+        persistAuthorization: true,
+        displayRequestDuration: true,
+        docExpansion: 'list',
+        filter: true
+    }
+};
+
+const swaggerUiOptionsEt = {
+    explorer: true,
+    customSiteTitle: "API Dokumentatsioon",
+    swaggerOptions: {
+        persistAuthorization: true,
+        displayRequestDuration: true,
+        docExpansion: 'list',
+        filter: true
+    }
+};
+
+// Set up English Swagger UI using serveFiles as per documentation
+app.use('/en', swaggerUi.serveFiles(swaggerDocument, swaggerUiOptions), swaggerUi.setup(swaggerDocument, swaggerUiOptions));
+
+// Set up Estonian Swagger UI using serveFiles as per documentation
+app.use('/et', swaggerUi.serveFiles(swaggerDocumentEt, swaggerUiOptionsEt), swaggerUi.setup(swaggerDocumentEt, swaggerUiOptionsEt));
+
+// Default route - redirect to English version
+app.get('/', (req, res) => {
+    res.redirect('/en');
+});
 
 // Bearer auth middleware
 const authenticateToken = (req, res, next) => {

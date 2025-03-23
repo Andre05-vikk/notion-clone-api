@@ -64,11 +64,20 @@ The server will run on port 5001 by default. You can change this by setting the 
 
 ## API Documentation
 
-The API documentation is available at the root URL when the server is running:
+The API documentation is available in multiple languages when the server is running:
 
-- API Documentation: <http://localhost:5001/>
+- English Documentation: `<your-server-url>/en`
+- Estonian Documentation: `<your-server-url>/et`
+- Default (redirects to English): `<your-server-url>/`
 
-You can use the Swagger UI to test all endpoints directly from your browser.
+For local development:
+
+- English Documentation: <http://localhost:5001/en>
+- Estonian Documentation: <http://localhost:5001/et>
+- Default: <http://localhost:5001/>
+
+You can use the Swagger UI to test all endpoints directly from your browser. The documentation includes authorization
+persistence, so your bearer token will be saved between page refreshes.
 
 ## Error Handling
 
