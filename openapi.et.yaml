@@ -100,11 +100,11 @@ components:
         status:
           type: string
           enum:
-            - pending
-            - in_progress
-            - completed
-          default: pending
-        user_id:
+            - ootel
+            - töös
+            - valmis
+          default: ootel
+        userId:
           type: integer
           format: int64
         createdAt:
@@ -183,7 +183,7 @@ components:
         token:
           type: string
           description: JWT token autentimiseks
-          example: "jwt.token.example"
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 
   responses:
     BadRequest:
@@ -251,8 +251,7 @@ components:
                 error: "Autoriseerimata"
                 message: "Sellele ressursile juurdepääsuks on vaja autentimist"
 
-security:
-  - bearerAuth: [ ]
+
 
 x-tagGroups:
   - name: API Dokumentatsioon

@@ -1,4 +1,3 @@
-
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
@@ -30,13 +29,19 @@ router.post('/sessions', async (req, res) => {
         }
 
         const user = rows[0];
+        console.log('Login attempt:', {
+            username: user.username,
+            providedPassword: password,
+            storedHash: user.password
+        });
         const validPassword = await bcrypt.compare(password, user.password);
+        console.log('Password valid:', validPassword);
         if (!validPassword) {
             conn.release();
             return res.status(401).json({
                 code: 401,
                 error: 'Unauthorized',
-                message: 'Invalid username or password'
+                message: 'Invalid password'
             });
         }
 

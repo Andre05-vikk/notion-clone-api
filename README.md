@@ -6,7 +6,6 @@ A RESTful API for managing tasks and users, built with Node.js, Express, and Mar
 
 - User authentication with JWT
 - Task management (create, read, update, delete)
-- Pagination, sorting, and filtering for tasks
 - Swagger UI for API documentation and testing
 
 ## Prerequisites
@@ -22,7 +21,7 @@ A RESTful API for managing tasks and users, built with Node.js, Express, and Mar
 npm install
 ```
 
-1. Set up the environment variables:
+2. Set up the environment variables:
 
 ```bash
 # Create a .env file with your database connection details
@@ -39,7 +38,7 @@ DB_DATABASE=notion_clone
 JWT_SECRET=your-secret-key
 ```
 
-1. Set up the database:
+3. Set up the database:
 
 ```bash
 # Create the database and tables
@@ -76,12 +75,7 @@ For local development:
 - Estonian Documentation: <http://localhost:5001/et>
 - Default: <http://localhost:5001/>
 
-You can use the Swagger UI to test all endpoints directly from your browser. The documentation includes authorization
-persistence, so your bearer token will be saved between page refreshes.
-
-## Error Handling
-
-The API uses standard HTTP status codes and provides detailed error messages in the response body.
+You can use the Swagger UI to test all endpoints directly from your browser.
 
 ## Database Structure
 

@@ -251,8 +251,7 @@ components:
                 error: "Unauthorized"
                 message: "Authentication is required to access this resource"
 
-security:
-  - bearerAuth: []
+
 
 x-tagGroups:
   - name: API Documentation

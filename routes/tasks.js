@@ -154,6 +154,9 @@ router.patch('/:taskId', (req, res, next) => req.app.locals.authenticateToken(re
         const conn = await pool.getConnection();
         const taskId = parseInt(req.params.taskId);
 
+        // Log the exact values we receive
+        console.log('Raw request body:', req.body);
+
         const taskResult = await conn.query('SELECT * FROM tasks WHERE id = ? AND user_id = ?', [taskId, req.user.id]);
         const tasks = taskResult[0];
         if (!tasks || tasks.length === 0) {
@@ -166,18 +169,9 @@ router.patch('/:taskId', (req, res, next) => req.app.locals.authenticateToken(re
         }
 
         const updates = ['updated_at = ?'];
-        // Format date in MySQL/MariaDB compatible format (YYYY-MM-DD HH:MM:SS)
         const values = [new Date().toISOString().slice(0, 19).replace('T', ' ')];
 
         if (title !== undefined) {
-            if (title.length < 1) {
-                conn.release();
-                return res.status(400).json({
-                    code: 400,
-                    error: 'Bad Request',
-                    message: 'Title must be at least 1 character long'
-                });
-            }
             updates.push('title = ?');
             values.push(title);
         }
@@ -186,47 +180,41 @@ router.patch('/:taskId', (req, res, next) => req.app.locals.authenticateToken(re
             values.push(description);
         }
         if (status !== undefined) {
+            // Validate status value
             if (!['pending', 'in_progress', 'completed'].includes(status)) {
                 conn.release();
                 return res.status(400).json({
                     code: 400,
                     error: 'Bad Request',
-                    message: 'Invalid status'
+                    message: 'Status must be one of: pending, in_progress, completed'
                 });
             }
+            // Add status to update query exactly as received
             updates.push('status = ?');
             values.push(status);
+            // Log the exact status value being used
+            console.log('Status value being used:', status);
         }
 
-        if (updates.length === 1) {
+        values.push(taskId, req.user.id);
+        const updateQuery = `UPDATE tasks SET ${updates.join(', ')} WHERE id = ? AND user_id = ?`;
+
+        try {
+            const result = await conn.query(updateQuery, values);
             conn.release();
-            return res.status(400).json({
-                code: 400,
-                error: 'Bad Request',
-                message: 'No fields to update provided'
+            return res.json({
+                success: true,
+                message: 'Task updated successfully'
+            });
+        } catch (error) {
+            console.error('Error executing update query:', error);
+            conn.release();
+            return res.status(500).json({
+                code: 500,
+                error: 'Internal Server Error',
+                message: 'Failed to update task'
             });
         }
-
-        values.push(taskId);
-        await conn.query(`UPDATE tasks SET ${updates.join(', ')} WHERE id = ?`, values);
-
-        const updatedTaskResult = await conn.query(
-            'SELECT id, title, description, status, user_id, created_at as createdAt, updated_at as updatedAt FROM tasks WHERE id = ?',
-            [taskId]
-        );
-        let updatedTask = updatedTaskResult[0][0]; // Get the first row from the result
-
-        // Convert BigInt values to regular numbers
-        if (updatedTask) {
-            updatedTask = {
-                ...updatedTask,
-                id: Number(updatedTask.id),
-                user_id: Number(updatedTask.user_id)
-            };
-        }
-        conn.release();
-
-        return res.json(updatedTask);
     } catch (error) {
         console.error('Error updating task:', error);
         return res.status(500).json({
