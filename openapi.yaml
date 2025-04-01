@@ -8,7 +8,8 @@ info:
     email: contact@yourdomain.com
 
 servers:
-  - url: /
+  - url: ${API_URL}
+    description: API server URL (defaults to http://localhost:5001 if not set)
 
 components:
   securitySchemes:

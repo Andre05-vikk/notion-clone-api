@@ -1,4 +1,3 @@
-
 const express = require('express');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
@@ -13,6 +12,10 @@ require('dotenv').config();
 // Default JWT secret
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
+// Set API URL based on environment
+const API_URL = process.env.API_URL || 'http://localhost:5001';
+process.env.API_URL = API_URL;
+
 // DB config
 const dbConfig = {
     host: process.env.DB_HOST || 'localhost',
@@ -20,6 +23,26 @@ const dbConfig = {
     password: process.env.DB_PASSWORD || 'root',
     database: process.env.DB_DATABASE || 'notion_clone',
     connectionLimit: 5
+};
+
+// Load OpenAPI specs with environment variable substitution
+const loadOpenAPISpec = (filePath) => {
+    let spec = YAML.load(filePath);
+
+    // Only replace API_URL environment variable
+    if (spec.servers && Array.isArray(spec.servers)) {
+        spec.servers = spec.servers.map(server => {
+            if (server.url === '${API_URL}') {
+                return {
+                    ...server,
+                    url: API_URL
+                };
+            }
+            return server;
+        });
+    }
+
+    return spec;
 };
 
 const app = express();
@@ -68,11 +91,9 @@ app.locals.JWT_SECRET = JWT_SECRET;
 app.use(cors());
 app.use(express.json());
 
-// Load OpenAPI English version
-const swaggerDocument = YAML.load(path.join(__dirname, 'openapi.yaml'));
-
-// Load OpenAPI Estonian version
-const swaggerDocumentEt = YAML.load(path.join(__dirname, 'openapi.et.yaml'));
+// Load OpenAPI specs with environment variable substitution
+const swaggerDocument = loadOpenAPISpec(path.join(__dirname, 'openapi.yaml'));
+const swaggerDocumentEt = loadOpenAPISpec(path.join(__dirname, 'openapi.et.yaml'));
 
 // Configure Swagger UI options
 const swaggerUiOptions = {
@@ -141,7 +162,7 @@ app.use('/tasks', require('./routes/tasks'));
 app.use('/', require('./routes/auth'));
 
 // Global error handler
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
     console.error('Unhandled error:', err);
 
     // Determine if we have a specific status code from the error
