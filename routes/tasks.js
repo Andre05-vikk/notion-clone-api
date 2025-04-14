@@ -246,7 +246,7 @@ router.delete('/:taskId', (req, res, next) => req.app.locals.authenticateToken(r
         await conn.query('DELETE FROM tasks WHERE id = ?', [taskId]);
         conn.release();
 
-        return res.json({ message: 'Task deleted successfully' });
+        return res.sendStatus(204); // No Content - successful deletion without response body
     } catch (error) {
         console.error('Error deleting task:', error);
         return res.status(500).json({

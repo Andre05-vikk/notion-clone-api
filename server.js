@@ -48,8 +48,13 @@ const loadOpenAPISpec = (filePath) => {
 const app = express();
 const pool = mariadb.createPool(dbConfig);
 
+// Create a simple in-memory token blacklist
+// In a production environment, this should be stored in Redis or another persistent store
+const tokenBlacklist = new Set();
+
 app.locals.pool = pool;
 app.locals.JWT_SECRET = JWT_SECRET;
+app.locals.tokenBlacklist = tokenBlacklist;
 
 // Attempt DB connection
 (async () => {
@@ -130,7 +135,7 @@ app.get('/', (req, res) => {
 });
 
 // Bearer auth middleware
-const authenticateToken = (req, res, next) => {
+const authenticateToken = async (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
     if (!token) {
@@ -141,17 +146,57 @@ const authenticateToken = (req, res, next) => {
         });
     }
 
-    jwt.verify(token, app.locals.JWT_SECRET, (err, user) => {
-        if (err) {
-            return res.status(403).json({
-                code: 403,
-                error: 'Forbidden',
-                message: 'Invalid or expired token'
+    // Check if token is blacklisted
+    if (app.locals.tokenBlacklist.has(token)) {
+        return res.status(401).json({
+            code: 401,
+            error: 'Unauthorized',
+            message: 'Token has been revoked'
+        });
+    }
+
+    try {
+        // Verify token signature and expiration
+        const user = jwt.verify(token, app.locals.JWT_SECRET);
+
+        // Check if user still exists in database
+        const pool = req.app.locals.pool;
+        const conn = await pool.getConnection();
+
+        try {
+            const rows = await conn.query('SELECT id FROM users WHERE id = ?', [user.id]);
+
+            if (rows.length === 0) {
+                conn.release();
+                return res.status(410).json({
+                    code: 410,
+                    error: 'Gone',
+                    message: 'User account no longer exists'
+                });
+            }
+
+            // User exists, proceed
+            req.user = user;
+            // Store the token in the request for potential blacklisting during logout
+            req.token = token;
+            conn.release();
+            next();
+        } catch (dbError) {
+            conn.release();
+            console.error('Database error during token verification:', dbError);
+            return res.status(500).json({
+                code: 500,
+                error: 'Internal Server Error',
+                message: 'Error verifying user account'
             });
         }
-        req.user = user;
-        next();
-    });
+    } catch (err) {
+        return res.status(403).json({
+            code: 403,
+            error: 'Forbidden',
+            message: 'Invalid or expired token'
+        });
+    }
 };
 
 app.locals.authenticateToken = authenticateToken;
@@ -161,21 +206,70 @@ app.use('/users', require('./routes/users'));
 app.use('/tasks', require('./routes/tasks'));
 app.use('/', require('./routes/auth'));
 
-// Global error handler
 app.use((err, req, res, next) => {
-    console.error('Unhandled error:', err);
-
-    // Determine if we have a specific status code from the error
-    const statusCode = err.statusCode || 500;
-    const errorType = statusCode === 500 ? 'Internal Server Error' : err.type || 'Error';
-    const errorMessage = err.message || 'An unexpected error occurred';
-
-    res.status(statusCode).json({
-        code: statusCode,
-        error: errorType,
-        message: errorMessage
+    // Log the full error with stack trace
+    console.error('Detailed error:', {
+        message: err.message,
+        stack: err.stack,
+        type: err.type || 'Undefined',
+        code: err.statusCode || 500
     });
-    // We don't call next() here as we've ended the response cycle
+
+    try {
+        // Verify response object integrity
+        if (!res || typeof res.status !== 'function' || typeof res.json !== 'function') {
+            console.error('Invalid response object detected:', {
+                exists: !!res,
+                hasStatusMethod: !!(res && res.status),
+                hasJsonMethod: !!(res && res.json)
+            });
+
+            // Fallback response if res object is corrupted
+            if (res && typeof res.end === 'function') {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    code: 500,
+                    error: 'Critical Server Error',
+                    message: 'Response object corruption detected'
+                }));
+            }
+            return;
+        }
+
+        // Normal error handling
+        const statusCode = err.statusCode || 500;
+        const errorType = statusCode === 500 ? 'Internal Server Error' : err.type || 'Error';
+        const errorMessage = err.message || 'An unexpected error occurred';
+
+        // Additional context logging
+        console.error('Error context:', {
+            endpoint: req.originalUrl,
+            method: req.method,
+            statusCode,
+            errorType,
+            errorMessage
+        });
+
+        res.status(statusCode).json({
+            code: statusCode,
+            error: errorType,
+            message: errorMessage
+        });
+
+    } catch (handlingError) {
+        // Log if error handling itself fails
+        console.error('Error in error handler:', handlingError);
+
+        // Last resort response
+        if (res && !res.headersSent && typeof res.end === 'function') {
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+                code: 500,
+                error: 'Critical Error',
+                message: 'Error handling failed'
+            }));
+        }
+    }
 });
 
 // Start server

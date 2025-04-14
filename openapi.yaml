@@ -239,6 +239,19 @@ components:
                 error: "Not Found"
                 message: "The requested resource could not be found"
 
+    GoneError:
+      description: Resource no longer exists
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          examples:
+            GoneError:
+              value:
+                code: 410
+                error: "Gone"
+                message: "The requested resource is no longer available"
+
     UnauthorizedError:
       description: Authentication required
       content:
@@ -323,6 +336,10 @@ paths:
                   $ref: "#/components/schemas/Users"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        "410":
+          $ref: "#/components/responses/GoneError"
 
   /users/{userId}:
     parameters:
@@ -352,6 +369,8 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "404":
           $ref: "#/components/responses/NotFoundError"
+        "410":
+          $ref: "#/components/responses/GoneError"
     delete:
       tags:
         - Users
@@ -363,20 +382,15 @@ paths:
       responses:
         "204":
           description: User deleted successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: User deleted successfully
+          # 204 responses should not have content
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/ForbiddenError"
         "404":
           $ref: "#/components/responses/NotFoundError"
+        "410":
+          $ref: "#/components/responses/GoneError"
         "500":
           $ref: "#/components/responses/InternalServerError"
     patch:
@@ -406,6 +420,8 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "404":
           $ref: "#/components/responses/NotFoundError"
+        "410":
+          $ref: "#/components/responses/GoneError"
 
   /sessions:
     post:
@@ -440,8 +456,11 @@ paths:
       responses:
         "204":
           description: Session successfully deleted
+          # 204 responses should not have content
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+        "410":
+          $ref: "#/components/responses/GoneError"
         "500":
           $ref: "#/components/responses/InternalServerError"
 
@@ -512,6 +531,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+        "410":
+          $ref: "#/components/responses/GoneError"
         "500":
           $ref: "#/components/responses/InternalServerError"
 
@@ -540,6 +561,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+        "410":
+          $ref: "#/components/responses/GoneError"
         "500":
           $ref: "#/components/responses/InternalServerError"
 
@@ -563,20 +586,15 @@ paths:
       responses:
         "204":
           description: Task successfully deleted
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Task deleted successfully
+          # 204 responses should not have content
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/ForbiddenError"
         "404":
           $ref: "#/components/responses/NotFoundError"
+        "410":
+          $ref: "#/components/responses/GoneError"
         "500":
           $ref: "#/components/responses/InternalServerError"
     patch:
@@ -608,5 +626,7 @@ paths:
           $ref: "#/components/responses/ForbiddenError"
         "404":
           $ref: "#/components/responses/NotFoundError"
+        "410":
+          $ref: "#/components/responses/GoneError"
         "500":
           $ref: "#/components/responses/InternalServerError"

@@ -186,7 +186,7 @@ router.delete('/:userId', (req, res, next) => req.app.locals.authenticateToken(r
         await conn.query('DELETE FROM users WHERE id = ?', [userId]);
         conn.release();
 
-        return res.json({ message: 'User deleted successfully' });
+        return res.sendStatus(204); // No Content - successful deletion without response body
     } catch (error) {
         console.error('Error deleting user:', error);
         return res.status(500).json({

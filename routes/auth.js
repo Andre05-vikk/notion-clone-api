@@ -69,9 +69,14 @@ router.delete(
     (req, res, next) => req.app.locals.authenticateToken(req, res, next),
     async (req, res) => {
         try {
-            // JWT is stateless, cannot invalidate server-side
-            // Client should discard the token
-            return res.status(204).send();
+            // Add the token to the blacklist
+            if (req.token) {
+                req.app.locals.tokenBlacklist.add(req.token);
+                console.log('Token blacklisted:', req.token.substring(0, 10) + '...');
+            }
+
+            // Return 204 No Content without body
+            return res.sendStatus(204);
         } catch (error) {
             console.error('Error processing logout:', error);
             return res.status(500).json({
