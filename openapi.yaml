@@ -212,6 +212,11 @@ components:
                 code: 403
                 error: "Forbidden"
                 message: "You don't have permission to access this resource"
+            InvalidTokenError:
+              value:
+                code: 403
+                error: "Forbidden"
+                message: "Invalid or expired token"
 
     InternalServerError:
       description: Internal server error
@@ -367,6 +372,8 @@ paths:
                 $ref: "#/components/schemas/Users"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
         "404":
           $ref: "#/components/responses/NotFoundError"
         "410":
@@ -418,10 +425,14 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
         "404":
           $ref: "#/components/responses/NotFoundError"
         "410":
           $ref: "#/components/responses/GoneError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /sessions:
     post:
@@ -459,6 +470,8 @@ paths:
           # 204 responses should not have content
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
         "410":
           $ref: "#/components/responses/GoneError"
         "500":
@@ -531,6 +544,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
         "410":
           $ref: "#/components/responses/GoneError"
         "500":
@@ -561,6 +576,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
         "410":
           $ref: "#/components/responses/GoneError"
         "500":
