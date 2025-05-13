@@ -206,6 +206,22 @@ app.use('/users', require('./routes/users'));
 app.use('/tasks', require('./routes/tasks'));
 app.use('/', require('./routes/auth'));
 
+// Serve frontend static build
+app.use(express.static(path.join(__dirname, 'frontend', 'build')));
+
+// Catch-all route for frontend
+app.get('*', (req, res, next) => {
+  // Väldi API ja Swagger UI marsruutide kattumist
+  if (req.path.startsWith('/users') ||
+      req.path.startsWith('/tasks') ||
+      req.path.startsWith('/sessions') ||
+      req.path.startsWith('/en') ||
+      req.path.startsWith('/et')) {
+    return next();
+  }
+  res.sendFile(path.join(__dirname, 'frontend', 'build', 'index.html'));
+});
+
 app.use((err, req, res, next) => {
     // Log the full error with stack trace
     console.error('Detailed error:', {

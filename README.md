@@ -85,7 +85,50 @@ npm run client
 npm run dev-full
 ```
 
-The backend server will run on port 5001 by default, and the frontend will run on port 3000. You can change the backend port by setting the PORT environment variable in your .env file.
+The backend server will run on port 5001 by default, and the frontend will run on port 3000 in development mode. You can change the backend port by setting the PORT environment variable in your .env file.
+
+### Production Deployment
+
+For production deployment, the application is configured to serve both the backend API and frontend from a single server:
+
+1. Build the frontend:
+```bash
+cd frontend
+npm install
+npm run build
+cd ..
+```
+
+2. Start the server:
+```bash
+node notion-clone-api.js
+```
+
+
+### Using PM2 for Production
+
+For production environments, it's recommended to use PM2 to manage the Node.js process:
+
+1. Install PM2 globally (if not already installed):
+```bash
+npm install -g pm2
+```
+
+2. Start the application with PM2:
+```bash
+pm2 start notion-clone-api.js
+```
+
+3. To ensure the application starts automatically after server reboot:
+```bash
+pm2 startup
+pm2 save
+```
+
+4. To restart the application after changes:
+```bash
+pm2 restart notion-clone-api
+```
 
 ## API Documentation
 
