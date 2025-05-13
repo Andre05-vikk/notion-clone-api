@@ -1,12 +1,22 @@
-# Notion Clone API
+# Notion Clone - Full Stack Application
 
-A RESTful API for managing tasks and users, built with Node.js, Express, and MariaDB.
+A full-stack task management application with a Node.js/Express backend API and React/TypeScript frontend.
 
 ## Features
 
+### Backend
 - User authentication with JWT
 - Task management (create, read, update, delete)
-- Swagger UI for API documentation and testing
+- Swagger UI for API documentation and testing in multiple languages
+- Secure password handling with bcrypt
+- Token blacklisting for logout
+
+### Frontend
+- User authentication (register, login, logout)
+- User profile management (update password, delete account)
+- Task management with filtering and sorting
+- Responsive design
+- Form validation
 
 ## Prerequisites
 
@@ -15,7 +25,9 @@ A RESTful API for managing tasks and users, built with Node.js, Express, and Mar
 
 ## Installation
 
-1. Install dependencies:
+### Backend
+
+1. Install backend dependencies:
 
 ```bash
 npm install
@@ -45,21 +57,35 @@ JWT_SECRET=your-secret-key
 mysql -u root -p < database.sql
 ```
 
+### Frontend
+
+1. Install frontend dependencies:
+
+```bash
+npm run client-install
+```
+
 ## Running the Application
 
-### Development Mode
+### Backend Only (Development Mode)
 
 ```bash
 npm run dev
 ```
 
-### Production Mode
+### Frontend Only
 
 ```bash
-npm start
+npm run client
 ```
 
-The server will run on port 5001 by default. You can change this by setting the PORT environment variable in your .env file.
+### Full Stack (Backend and Frontend)
+
+```bash
+npm run dev-full
+```
+
+The backend server will run on port 5001 by default, and the frontend will run on port 3000. You can change the backend port by setting the PORT environment variable in your .env file.
 
 ## API Documentation
 
@@ -83,3 +109,47 @@ The application uses two main tables:
 
 - `users`: Stores user information
 - `tasks`: Stores task information with a foreign key to the users table
+
+## Project Structure
+
+```
+notion-clone-api/
+├── frontend/                  # React frontend application
+│   ├── public/                # Static files
+│   ├── src/                   # Source files
+│   │   ├── components/        # Reusable components
+│   │   ├── contexts/          # React contexts
+│   │   ├── pages/             # Page components
+│   │   ├── services/          # API services
+│   │   ├── types/             # TypeScript type definitions
+│   │   └── utils/             # Utility functions
+│   ├── package.json           # Frontend dependencies
+│   └── tsconfig.json          # TypeScript configuration
+├── routes/                    # Backend API routes
+│   ├── auth.js                # Authentication routes
+│   ├── tasks.js               # Task management routes
+│   └── users.js               # User management routes
+├── openapi.yaml               # OpenAPI specification (English)
+├── openapi.et.yaml            # OpenAPI specification (Estonian)
+├── notion-clone-api.js        # Express server setup
+├── package.json               # Backend dependencies
+└── README.md                  # Project documentation
+```
+
+## Technologies Used
+
+### Backend
+- Node.js
+- Express
+- MariaDB
+- JWT for authentication
+- bcrypt for password hashing
+- Swagger/OpenAPI for documentation
+
+### Frontend
+- React
+- TypeScript
+- React Router for navigation
+- Axios for API requests
+- Context API for state management
+- Custom CSS for styling

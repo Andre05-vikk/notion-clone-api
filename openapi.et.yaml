@@ -9,7 +9,7 @@ info:
 
 servers:
   - url: ${API_URL}
-    description: API serveri URL (vaikimisi http://localhost:5001, kui pole määratud)
+    description: API serveri URL
 
 components:
   securitySchemes:

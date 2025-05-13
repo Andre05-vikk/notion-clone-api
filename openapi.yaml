@@ -9,7 +9,7 @@ info:
 
 servers:
   - url: ${API_URL}
-    description: API server URL (defaults to http://localhost:5001 if not set)
+    description: API server URL
 
 components:
   securitySchemes:
