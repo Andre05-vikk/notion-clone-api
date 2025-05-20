@@ -1,13 +1,13 @@
 // User types
 export interface User {
   id: number;
-  username: string;
+  email: string;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface UserCredentials {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -58,8 +58,8 @@ export interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (username: string, password: string) => Promise<void>;
-  register: (username: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   updatePassword: (userId: number, password: string) => Promise<void>;
   deleteAccount: (userId: number) => Promise<void>;

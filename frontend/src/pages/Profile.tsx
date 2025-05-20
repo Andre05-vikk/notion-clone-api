@@ -13,27 +13,27 @@ const Profile: React.FC = () => {
   // Handle password update
   const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate form
     if (!password || !confirmPassword) {
       setError('All fields are required');
       return;
     }
-    
+
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
-    
+
     if (password.length < 6) {
       setError('Password must be at least 6 characters long');
       return;
     }
-    
+
     setError(null);
     setSuccess(null);
     setIsSubmitting(true);
-    
+
     try {
       if (user) {
         await updatePassword(user.id, password);
@@ -57,7 +57,7 @@ const Profile: React.FC = () => {
   const handleDeleteAccount = async () => {
     setError(null);
     setIsSubmitting(true);
-    
+
     try {
       if (user) {
         await deleteAccount(user.id);
@@ -81,28 +81,28 @@ const Profile: React.FC = () => {
   return (
     <div className="profile-container">
       <h1>Profile</h1>
-      
+
       <div className="user-info">
-        <p><strong>Username:</strong> {user.username}</p>
+        <p><strong>Email:</strong> {user.email}</p>
         <p><strong>Account Created:</strong> {new Date(user.createdAt).toLocaleString()}</p>
         <p><strong>Last Updated:</strong> {new Date(user.updatedAt).toLocaleString()}</p>
       </div>
-      
+
       <div className="password-update-section">
         <h2>Update Password</h2>
-        
+
         {error && (
           <div className="error-message">
             {error}
           </div>
         )}
-        
+
         {success && (
           <div className="success-message">
             {success}
           </div>
         )}
-        
+
         <form onSubmit={handlePasswordUpdate}>
           <div className="form-group">
             <label htmlFor="password">New Password</label>
@@ -117,7 +117,7 @@ const Profile: React.FC = () => {
             />
             <small>Password must be at least 6 characters long</small>
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="confirmPassword">Confirm New Password</label>
             <input
@@ -129,9 +129,9 @@ const Profile: React.FC = () => {
               required
             />
           </div>
-          
-          <button 
-            type="submit" 
+
+          <button
+            type="submit"
             disabled={isSubmitting}
             className="btn-primary"
           >
@@ -139,12 +139,12 @@ const Profile: React.FC = () => {
           </button>
         </form>
       </div>
-      
+
       <div className="danger-zone">
         <h2>Danger Zone</h2>
-        
+
         {!showDeleteConfirm ? (
-          <button 
+          <button
             className="btn-danger"
             onClick={() => setShowDeleteConfirm(true)}
           >
@@ -154,14 +154,14 @@ const Profile: React.FC = () => {
           <div className="delete-confirmation">
             <p>Are you sure you want to delete your account? This action cannot be undone.</p>
             <div className="confirmation-actions">
-              <button 
+              <button
                 className="btn-danger"
                 onClick={handleDeleteAccount}
                 disabled={isSubmitting}
               >
                 {isSubmitting ? 'Deleting...' : 'Yes, Delete My Account'}
               </button>
-              <button 
+              <button
                 className="btn-secondary"
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={isSubmitting}

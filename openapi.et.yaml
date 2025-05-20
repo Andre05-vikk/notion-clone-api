@@ -8,7 +8,7 @@ info:
     email: contact@yourdomain.com
 
 servers:
-  - url: ${API_URL}
+  - url: /
     description: API serveri URL
 
 components:

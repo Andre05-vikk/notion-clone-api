@@ -8,6 +8,8 @@
     "dev": "nodemon notion-clone-api.js",
     "client": "cd frontend && npm start",
     "client-install": "cd frontend && npm install",
+    "client-build": "cd frontend && npm run build",
+    "setup": "npm install && npm run client-install && npm run client-build",
     "dev-full": "concurrently \"npm run dev\" \"npm run client\""
   },
   "private": true,

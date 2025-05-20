@@ -16,7 +16,7 @@ const Navigation: React.FC = () => {
       <div className="nav-brand">
         <Link to="/">Task Manager</Link>
       </div>
-      
+
       <ul className="nav-links">
         {isAuthenticated ? (
           <>
@@ -30,7 +30,7 @@ const Navigation: React.FC = () => {
               <Link to="/profile">Profile</Link>
             </li>
             <li>
-              <button 
+              <button
                 className="btn-logout"
                 onClick={() => logout()}
               >
@@ -39,7 +39,7 @@ const Navigation: React.FC = () => {
             </li>
             {user && (
               <li className="user-info">
-                <span>Logged in as {user.username}</span>
+                <span>Logged in as {user.email}</span>
               </li>
             )}
           </>

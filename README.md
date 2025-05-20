@@ -25,22 +25,22 @@ A full-stack task management application with a Node.js/Express backend API and 
 
 ## Installation
 
-### Backend
+### Quick Setup (Recommended)
 
-1. Install backend dependencies:
+1. Install all dependencies and build the frontend with a single command:
 
 ```bash
-npm install
+npm run setup
 ```
+
+This command will:
+- Install backend dependencies
+- Install frontend dependencies
+- Build the frontend for production
 
 2. Set up the environment variables:
 
-```bash
-# Create a .env file with your database connection details
-npm run create-env
-```
-
-Or manually create a `.env` file with the following content:
+Create a `.env` file with the following content:
 
 ```bash
 DB_HOST=localhost
@@ -57,12 +57,30 @@ JWT_SECRET=your-secret-key
 mysql -u root -p < database.sql
 ```
 
-### Frontend
+### Manual Installation (Alternative)
+
+If you prefer to install components separately:
+
+#### Backend
+
+1. Install backend dependencies:
+
+```bash
+npm install
+```
+
+#### Frontend
 
 1. Install frontend dependencies:
 
 ```bash
 npm run client-install
+```
+
+2. Build the frontend for production:
+
+```bash
+npm run client-build
 ```
 
 ## Running the Application
@@ -91,17 +109,14 @@ The backend server will run on port 5001 by default, and the frontend will run o
 
 For production deployment, the application is configured to serve both the backend API and frontend from a single server:
 
-1. Build the frontend:
+1. Set up the application (if not already done):
 ```bash
-cd frontend
-npm install
-npm run build
-cd ..
+npm run setup
 ```
 
 2. Start the server:
 ```bash
-node notion-clone-api.js
+npm start
 ```
 
 
@@ -136,13 +151,13 @@ The API documentation is available in multiple languages when the server is runn
 
 - English Documentation: `<your-server-url>/en`
 - Estonian Documentation: `<your-server-url>/et`
-- Default (redirects to English): `<your-server-url>/`
+- Main application: `<your-server-url>/` (serves the frontend)
 
 For local development:
 
 - English Documentation: <http://localhost:5001/en>
 - Estonian Documentation: <http://localhost:5001/et>
-- Default: <http://localhost:5001/>
+- Main application: <http://localhost:5001/> (serves the frontend)
 
 You can use the Swagger UI to test all endpoints directly from your browser.
 

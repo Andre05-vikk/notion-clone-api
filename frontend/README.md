@@ -13,23 +13,32 @@ This is a React frontend application for the Task Manager API. It provides a use
 ## Prerequisites
 
 - Node.js (v14 or higher)
-- npm or yarn
+- npm
 - Backend API running (default: http://localhost:5001)
 
 ## Installation
 
-1. Clone the repository
-2. Navigate to the frontend directory:
+### Option 1: Using the root project setup (Recommended)
+
+If you're setting up the entire project (backend and frontend), you can use the simplified setup process from the root directory:
+
+```
+npm run setup
+```
+
+This will install both backend and frontend dependencies and build the frontend for production.
+
+### Option 2: Manual frontend setup
+
+If you only want to set up the frontend:
+
+1. Navigate to the frontend directory:
    ```
    cd frontend
    ```
-3. Install dependencies:
+2. Install dependencies:
    ```
    npm install
-   ```
-   or
-   ```
-   yarn install
    ```
 
 ## Configuration
@@ -49,10 +58,6 @@ To start the development server:
 ```
 npm start
 ```
-or
-```
-yarn start
-```
 
 The application will be available at `http://localhost:3000`.
 
@@ -62,10 +67,6 @@ To create a production build:
 
 ```
 npm run build
-```
-or
-```
-yarn build
 ```
 
 The build files will be created in the `build` directory.

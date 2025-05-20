@@ -13,10 +13,10 @@ const Users: React.FC = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       if (!isAuthenticated) return;
-      
+
       setIsLoading(true);
       setError(null);
-      
+
       try {
         const response = await usersAPI.getAllUsers();
         setUsers(response.data);
@@ -44,13 +44,13 @@ const Users: React.FC = () => {
   return (
     <div className="users-container">
       <h1>Users</h1>
-      
+
       {error && (
         <div className="error-message">
           {error}
         </div>
       )}
-      
+
       {isLoading ? (
         <div className="loading">Loading users...</div>
       ) : users.length === 0 ? (
@@ -61,7 +61,7 @@ const Users: React.FC = () => {
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Username</th>
+                <th>Email</th>
                 <th>Created At</th>
                 <th>Updated At</th>
               </tr>
@@ -70,7 +70,7 @@ const Users: React.FC = () => {
               {users.map(user => (
                 <tr key={user.id} className="user-item">
                   <td>{user.id}</td>
-                  <td>{user.username}</td>
+                  <td>{user.email}</td>
                   <td>{formatDate(user.createdAt)}</td>
                   <td>{formatDate(user.updatedAt)}</td>
                 </tr>

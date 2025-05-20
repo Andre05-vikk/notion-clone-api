@@ -129,9 +129,9 @@ app.use('/en', swaggerUi.serveFiles(swaggerDocument, swaggerUiOptions), swaggerU
 // Set up Estonian Swagger UI using serveFiles as per documentation
 app.use('/et', swaggerUi.serveFiles(swaggerDocumentEt, swaggerUiOptionsEt), swaggerUi.setup(swaggerDocumentEt, swaggerUiOptionsEt));
 
-// Default route - redirect to English version
+// Default route - serve frontend
 app.get('/', (req, res) => {
-    res.redirect('/en');
+    res.sendFile(path.join(__dirname, 'frontend', 'build', 'index.html'));
 });
 
 // Bearer auth middleware
