@@ -32,69 +32,69 @@ api.interceptors.response.use(
       localStorage.removeItem('token');
       window.location.href = '/login';
     }
-    
+
     // Handle 410 Gone errors (user deleted)
     if (error.response && error.response.status === 410) {
       localStorage.removeItem('token');
       window.location.href = '/login?deleted=true';
     }
-    
+
     return Promise.reject(error);
   }
 );
 
 // Authentication API
 export const authAPI = {
-  login: (username: string, password: string) => 
-    api.post('/sessions', { username, password }),
-  
-  logout: () => 
+  login: (email: string, password: string) =>
+    api.post('/sessions', { email, password }),
+
+  logout: () =>
     api.delete('/sessions'),
-  
-  register: (username: string, password: string) => 
-    api.post('/users', { username, password }),
+
+  register: (email: string, password: string) =>
+    api.post('/users', { email, password }),
 };
 
 // Users API
 export const usersAPI = {
-  getAllUsers: () => 
+  getAllUsers: () =>
     api.get('/users'),
-  
-  getUserById: (userId: number) => 
+
+  getUserById: (userId: number) =>
     api.get(`/users/${userId}`),
-  
-  updateUserPassword: (userId: number, password: string) => 
+
+  updateUserPassword: (userId: number, password: string) =>
     api.patch(`/users/${userId}`, { password }),
-  
-  deleteUser: (userId: number) => 
+
+  deleteUser: (userId: number) =>
     api.delete(`/users/${userId}`),
 };
 
 // Tasks API
 export const tasksAPI = {
-  getAllTasks: (params?: { 
-    page?: number; 
-    limit?: number; 
-    sort?: string; 
+  getAllTasks: (params?: {
+    page?: number;
+    limit?: number;
+    sort?: string;
     status?: 'pending' | 'in_progress' | 'completed';
-  }) => 
+  }) =>
     api.get('/tasks', { params }),
-  
-  createTask: (data: { 
-    title: string; 
-    description?: string; 
+
+  createTask: (data: {
+    title: string;
+    description?: string;
     status?: 'pending' | 'in_progress' | 'completed';
-  }) => 
+  }) =>
     api.post('/tasks', data),
-  
-  updateTask: (taskId: number, data: { 
-    title?: string; 
-    description?: string; 
+
+  updateTask: (taskId: number, data: {
+    title?: string;
+    description?: string;
     status?: 'pending' | 'in_progress' | 'completed';
-  }) => 
+  }) =>
     api.patch(`/tasks/${taskId}`, data),
-  
-  deleteTask: (taskId: number) => 
+
+  deleteTask: (taskId: number) =>
     api.delete(`/tasks/${taskId}`),
 };
 

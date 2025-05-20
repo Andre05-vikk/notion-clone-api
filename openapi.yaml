@@ -26,7 +26,7 @@ components:
         id:
           type: integer
           format: int64
-        username:
+        email:
           type: string
           format: email
         createdAt:
@@ -37,12 +37,12 @@ components:
           format: date-time
       required:
         - id
-        - username
+        - email
 
     PostUsersRequest:
       type: object
       properties:
-        username:
+        email:
           type: string
           format: email
           example: "email@domain.com"
@@ -52,7 +52,7 @@ components:
           minLength: 6
           example: "mypassword"
       required:
-        - username
+        - email
         - password
 
     PatchUsersUserIdRequest:
@@ -166,7 +166,7 @@ components:
     PostSessionRequest:
       type: object
       properties:
-        username:
+        email:
           type: string
           example: "email@domain.com"
         password:
@@ -175,7 +175,7 @@ components:
           minLength: 6
           example: "mypassword"
       required:
-        - username
+        - email
         - password
 
     PostSessionResponse:
@@ -311,7 +311,7 @@ paths:
         "400":
           $ref: "#/components/responses/BadRequest"
         "409":
-          description: Username already exists
+          description: Email already exists
           content:
             application/json:
               schema:
@@ -321,7 +321,7 @@ paths:
                   value:
                     code: 409
                     error: "Conflict"
-                    message: "Username already exists"
+                    message: "Email already exists"
     get:
       tags:
         - Users

@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const Register: React.FC = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -20,28 +20,28 @@ const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate form
-    if (!username || !password || !confirmPassword) {
+    if (!email || !password || !confirmPassword) {
       setError('All fields are required');
       return;
     }
-    
+
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
-    
+
     if (password.length < 6) {
       setError('Password must be at least 6 characters long');
       return;
     }
-    
+
     setError(null);
     setIsSubmitting(true);
-    
+
     try {
-      await register(username, password);
+      await register(email, password);
       // Redirect is handled in the register function
     } catch (err: any) {
       if (err.response && err.response.data) {
@@ -57,26 +57,26 @@ const Register: React.FC = () => {
   return (
     <div className="register-container">
       <h1>Register</h1>
-      
+
       {error && (
         <div className="error-message">
           {error}
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="username">Username (Email)</label>
+          <label htmlFor="email">Email</label>
           <input
             type="email"
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             disabled={isSubmitting}
             required
           />
         </div>
-        
+
         <div className="form-group">
           <label htmlFor="password">Password</label>
           <input
@@ -90,7 +90,7 @@ const Register: React.FC = () => {
           />
           <small>Password must be at least 6 characters long</small>
         </div>
-        
+
         <div className="form-group">
           <label htmlFor="confirmPassword">Confirm Password</label>
           <input
@@ -102,16 +102,16 @@ const Register: React.FC = () => {
             required
           />
         </div>
-        
-        <button 
-          type="submit" 
+
+        <button
+          type="submit"
           disabled={isSubmitting}
           className="btn-primary"
         >
           {isSubmitting ? 'Registering...' : 'Register'}
         </button>
       </form>
-      
+
       <p className="login-link">
         Already have an account? <Link to="/login">Login</Link>
       </p>

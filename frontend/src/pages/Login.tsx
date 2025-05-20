@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const Login: React.FC = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -28,18 +28,18 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate form
-    if (!username || !password) {
-      setError('Username and password are required');
+    if (!email || !password) {
+      setError('Email and password are required');
       return;
     }
-    
+
     setError(null);
     setIsSubmitting(true);
-    
+
     try {
-      await login(username, password);
+      await login(email, password);
       // Redirect is handled in the login function
     } catch (err: any) {
       if (err.response && err.response.data) {
@@ -55,26 +55,26 @@ const Login: React.FC = () => {
   return (
     <div className="login-container">
       <h1>Login</h1>
-      
+
       {error && (
         <div className="error-message">
           {error}
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="username">Username (Email)</label>
+          <label htmlFor="email">Email</label>
           <input
             type="email"
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             disabled={isSubmitting}
             required
           />
         </div>
-        
+
         <div className="form-group">
           <label htmlFor="password">Password</label>
           <input
@@ -86,16 +86,16 @@ const Login: React.FC = () => {
             required
           />
         </div>
-        
-        <button 
-          type="submit" 
+
+        <button
+          type="submit"
           disabled={isSubmitting}
           className="btn-primary"
         >
           {isSubmitting ? 'Logging in...' : 'Login'}
         </button>
       </form>
-      
+
       <p className="register-link">
         Don't have an account? <Link to="/register">Register</Link>
       </p>

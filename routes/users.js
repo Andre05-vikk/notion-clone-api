@@ -5,13 +5,13 @@ const bcrypt = require('bcrypt');
 
 // POST /users - Create a new user
 router.post('/', async (req, res) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!username || !password) {
+    if (!email || !password) {
         return res.status(400).json({
             code: 400,
             error: 'Bad Request',
-            message: 'Username and password are required'
+            message: 'Email and password are required'
         });
     }
     if (password.length < 6) {
@@ -26,20 +26,20 @@ router.post('/', async (req, res) => {
         const pool = req.app.locals.pool;
         const conn = await pool.getConnection();
 
-        const existing = await conn.query('SELECT * FROM users WHERE username = ?', [username]);
+        const existing = await conn.query('SELECT * FROM users WHERE username = ?', [email]);
         if (existing.length > 0) {
             conn.release();
             return res.status(409).json({
                 code: 409,
                 error: 'Conflict',
-                message: 'Username already exists'
+                message: 'Email already exists'
             });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const result = await conn.query(
             'INSERT INTO users (username, password) VALUES (?, ?)',
-            [username, hashedPassword]
+            [email, hashedPassword]
         );
 
         const [user] = await conn.query(

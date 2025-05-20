@@ -5,12 +5,12 @@ const jwt = require('jsonwebtoken');
 
 // POST /sessions - Login
 router.post('/sessions', async (req, res) => {
-    const { username, password } = req.body;
-    if (!username || !password) {
+    const { email, password } = req.body;
+    if (!email || !password) {
         return res.status(400).json({
             code: 400,
             error: 'Bad Request',
-            message: 'Username and password are required'
+            message: 'Email and password are required'
         });
     }
 
@@ -18,13 +18,13 @@ router.post('/sessions', async (req, res) => {
         const pool = req.app.locals.pool;
         const conn = await pool.getConnection();
 
-        const rows = await conn.query('SELECT * FROM users WHERE username = ?', [username]);
+        const rows = await conn.query('SELECT * FROM users WHERE username = ?', [email]);
         if (rows.length === 0) {
             conn.release();
             return res.status(401).json({
                 code: 401,
                 error: 'Unauthorized',
-                message: 'Invalid username or password'
+                message: 'Invalid email or password'
             });
         }
 
@@ -46,7 +46,7 @@ router.post('/sessions', async (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: user.id, username: user.username },
+            { id: user.id, email: user.username },
             req.app.locals.JWT_SECRET,
             { expiresIn: '7d' }
         );

@@ -10,7 +10,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // JWT token interface
 interface JwtPayload {
   id: number;
-  username: string;
+  email: string;
   exp: number;
   iat: number;
 }
@@ -33,12 +33,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       const token = localStorage.getItem('token');
-      
+
       if (token) {
         try {
           // Decode token to get user info
           const decoded = jwt_decode<JwtPayload>(token);
-          
+
           // Check if token is expired
           const currentTime = Date.now() / 1000;
           if (decoded.exp < currentTime) {
@@ -55,7 +55,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUser(null);
         }
       }
-      
+
       setIsLoading(false);
     };
 
@@ -63,21 +63,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   // Login function
-  const login = async (username: string, password: string) => {
+  const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      const response = await authAPI.login(username, password);
+      const response = await authAPI.login(email, password);
       const { token } = response.data;
-      
+
       localStorage.setItem('token', token);
-      
+
       // Decode token to get user ID
       const decoded = jwt_decode<JwtPayload>(token);
-      
+
       // Get user details
       const userResponse = await usersAPI.getUserById(decoded.id);
       setUser(userResponse.data);
-      
+
       navigate('/tasks');
     } catch (error) {
       console.error('Login failed:', error);
@@ -88,12 +88,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Register function
-  const register = async (username: string, password: string) => {
+  const register = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      await authAPI.register(username, password);
+      await authAPI.register(email, password);
       // After registration, log the user in
-      await login(username, password);
+      await login(email, password);
     } catch (error) {
       console.error('Registration failed:', error);
       throw error;
