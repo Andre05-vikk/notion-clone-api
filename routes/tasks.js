@@ -126,16 +126,25 @@ router.post('/', (req, res, next) => req.app.locals.authenticateToken(req, res, 
         const insertId = result.insertId ? Number(result.insertId) : null;
         console.log('Insert ID:', insertId);
 
-        // Return basic info without querying for the task
+        // Get the created task to return complete object
+        const [createdTask] = await conn.query(
+            'SELECT id, title, description, status, user_id, created_at, updated_at FROM tasks WHERE id = ?',
+            [insertId]
+        );
+        
         conn.release();
-        return res.status(201).json({
-            success: true,
-            message: 'Task created successfully',
-            taskId: insertId,
-            title: title,
-            description: description || null,
-            status: status || 'pending'
-        });
+        
+        const formattedTask = {
+            id: Number(createdTask.id),
+            title: createdTask.title,
+            description: createdTask.description,
+            status: createdTask.status,
+            user_id: Number(createdTask.user_id),
+            createdAt: createdTask.created_at,
+            updatedAt: createdTask.updated_at
+        };
+        
+        return res.status(201).json(formattedTask);
     } catch (error) {
         console.error('Error creating task:', error);
         return res.status(500).json({
@@ -201,11 +210,26 @@ router.patch('/:taskId', (req, res, next) => req.app.locals.authenticateToken(re
 
         try {
             const result = await conn.query(updateQuery, values);
+            
+            // Get the updated task to return complete object
+            const [updatedTask] = await conn.query(
+                'SELECT id, title, description, status, user_id, created_at, updated_at FROM tasks WHERE id = ? AND user_id = ?',
+                [taskId, req.user.id]
+            );
+            
             conn.release();
-            return res.json({
-                success: true,
-                message: 'Task updated successfully'
-            });
+            
+            const formattedTask = {
+                id: Number(updatedTask.id),
+                title: updatedTask.title,
+                description: updatedTask.description,
+                status: updatedTask.status,
+                user_id: Number(updatedTask.user_id),
+                createdAt: updatedTask.created_at,
+                updatedAt: updatedTask.updated_at
+            };
+            
+            return res.json(formattedTask);
         } catch (error) {
             console.error('Error executing update query:', error);
             conn.release();

@@ -43,7 +43,7 @@ router.post('/', async (req, res) => {
         );
 
         const [user] = await conn.query(
-            'SELECT id, username, created_at as createdAt, updated_at as updatedAt FROM users WHERE id = ?',
+            'SELECT id, username as email, created_at as createdAt, updated_at as updatedAt FROM users WHERE id = ?',
             [result.insertId]
         );
         conn.release();
@@ -66,7 +66,7 @@ router.get('/', (req, res, next) => req.app.locals.authenticateToken(req, res, n
         const conn = await pool.getConnection();
 
         const rows = await conn.query(
-            'SELECT id, username, created_at as createdAt, updated_at as updatedAt FROM users'
+            'SELECT id, username as email, created_at as createdAt, updated_at as updatedAt FROM users'
         );
         conn.release();
 
@@ -89,7 +89,7 @@ router.get('/:userId', (req, res, next) => req.app.locals.authenticateToken(req,
         const userId = parseInt(req.params.userId);
 
         const [user] = await conn.query(
-            'SELECT id, username, created_at as createdAt, updated_at as updatedAt FROM users WHERE id = ?',
+            'SELECT id, username as email, created_at as createdAt, updated_at as updatedAt FROM users WHERE id = ?',
             [userId]
         );
         conn.release();
@@ -143,7 +143,7 @@ router.patch('/:userId', (req, res, next) => req.app.locals.authenticateToken(re
         await conn.query('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, userId]);
 
         const [user] = await conn.query(
-            'SELECT id, username, created_at as createdAt, updated_at as updatedAt FROM users WHERE id = ?',
+            'SELECT id, username as email, created_at as createdAt, updated_at as updatedAt FROM users WHERE id = ?',
             [userId]
         );
         conn.release();
